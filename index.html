@@ -92,8 +92,10 @@
                 // 翻牌
                 $(this).parent().addClass('open-card')
 
-                if ($(this).attr('id') in openCard) {
-
+                if ('id' in openCard) {
+                    if ($(this).attr('class').split(' ')[1] !== openCard['class']) {
+                        $(`${openCard['id']}`).parent().removeClass('open-card')
+                    }
                 }
                 else {
                     openCard['id'] = $(this).attr('id')
