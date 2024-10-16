@@ -92,15 +92,38 @@
                 // 翻牌
                 $(this).parent().addClass('open-card')
 
+                // 如果已經翻一張了
                 if ('id' in openCard) {
-                    if ($(this).attr('class').split(' ')[1] !== openCard['class']) {
-                        $(`${openCard['id']}`).parent().removeClass('open-card')
+                    // 如果翻的牌配對失敗
+                    if (!$(this).hasClass(`${openCard['class']}`)) {
+                        // 暫存$(this)，避免計時器中的this指向window
+                        const tmpThis = $(this)
+                        // 暫存前一個正在打開的牌，避免計時器執行時物件已經被清空
+                        const tmpid = $(`#${openCard['id']}`)
+                        setTimeout(function () {
+                            tmpid.parent().removeClass('open-card')
+                            tmpThis.parent().removeClass('open-card')
+                        }, 1000)
                     }
+                    // 如果配對成功
+                    else {
+                        // 暫存$(this)，避免計時器中的this指向window
+                        const tmpThis = $(this)
+                        // 暫存前一個正在打開的牌，避免計時器執行時物件已經被清空
+                        const tmpid = $(`#${openCard['id']}`)
+                        setTimeout(function () {
+                            tmpid.parent().fadeTo(1000, 0, 'swing')
+                            tmpThis.parent().fadeTo(1000, 0, 'swing')
+                        }, 1000)
+                    }
+                    // 清空物件
+                    delete openCard.id
+                    delete openCard.class
                 }
+                // 如果還沒翻
                 else {
                     openCard['id'] = $(this).attr('id')
                     openCard['class'] = $(this).attr('class').split(' ')[1]
-                    console.log(openCard)
                 }
             })
             arr.splice(num, 1)
