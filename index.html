@@ -32,7 +32,7 @@
             height: 100%;
             position: absolute;
             background-size: 100% 100%;
-            transform: rotateY(180deg);
+            transform: rotateY(0deg);
             backface-visibility: hidden;
         }
 
@@ -42,11 +42,11 @@
             position: absolute;
             background-image: url(./images/Red_back.jpg);
             background-size: 100% 100%;
-            transform: rotateY(0deg);
+            transform: rotateY(180deg);
             backface-visibility: hidden;
         }
 
-        .open-card {
+        .close-card {
             transform: rotateY(180deg);
         }
 
@@ -58,9 +58,7 @@
 
 <body>
     <div class="container">
-        <div id="game-area">
-
-        </div>
+        <div id="game-area"></div>
         <div class="text">
             <input id="restart" type="button" value="重新開始">
         </div>
@@ -69,69 +67,78 @@
     <script src="https://code.jquery.com/jquery-3.7.1.js"
         integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
     <script>
-        // 隨機函數
-        const rand = (min, max) => {
-            return Math.floor(Math.random() * (max - min + 1)) + min
-        }
+        const game = () => {
+            // 隨機函數
+            const rand = (min, max) => {
+                return Math.floor(Math.random() * (max - min + 1)) + min
+            }
 
-        // 建立物件，存放場上正在翻開的牌的id(不包含成功配對的牌)
-        const openCard = {}
-        // 建立所有牌的陣列
-        const arr = [1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8]
-        // 第id張牌
-        let id = 1
+            // 建立物件，存放場上正在翻開的牌的id(不包含成功配對的牌)
+            const openCard = {}
+            // 建立所有牌的陣列
+            const arr = [1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8]
+            // 第id張牌
+            let id = 1
 
-        // 隨機分配牌
-        while (arr.length > 0) {
-            const num = rand(0, arr.length - 1)
-            $('#game-area').append(`<div class="box-img"><div class="font-side"></div><div id="card-${id}" class="back-side"></div>`)
-            $(`#card-${id}`).prev().css('background-image', `url(./images/${arr[num]}S.jpg)`)
-            $(`#card-${id}`).addClass(`${arr[num]}S`)
+            // 隨機分配牌
+            while (arr.length > 0) {
+                const num = rand(0, arr.length - 1)
+                $('#game-area').append(`<div class="box-img close-card"><div class="font-side"></div><div id="card-${id}" class="back-side"></div>`)
+                $(`#card-${id}`).prev().css('background-image', `url(./images/${arr[num]}S.jpg)`)
+                $(`#card-${id}`).addClass(`${arr[num]}S`)
 
-            $(`#card-${id}`).on('click', function () {
-                // 翻牌
-                $(this).parent().addClass('open-card')
+                $(`#card-${id}`).on('click', function () {
+                    // 翻牌
+                    $(this).parent().removeClass('close-card')
 
-                // 如果已經翻一張了
-                if ('id' in openCard) {
-                    // 如果翻的牌配對失敗
-                    if (!$(this).hasClass(`${openCard['class']}`)) {
-                        // 暫存$(this)，避免計時器中的this指向window
-                        const tmpThis = $(this)
-                        // 暫存前一個正在打開的牌，避免計時器執行時物件已經被清空
-                        const tmpid = $(`#${openCard['id']}`)
-                        setTimeout(function () {
-                            tmpid.parent().removeClass('open-card')
-                            tmpThis.parent().removeClass('open-card')
-                        }, 1000)
+                    // 如果已經翻一張了
+                    if ('id' in openCard) {
+                        // 如果翻的牌配對失敗
+                        if (!$(this).hasClass(`${openCard['class']}`)) {
+                            // 暫存$(this)，避免計時器中的this指向window
+                            const tmpThis = $(this)
+                            // 暫存前一個正在打開的牌，避免計時器執行時物件已經被清空
+                            const tmpid = $(`#${openCard['id']}`)
+                            setTimeout(function () {
+                                tmpid.parent().addClass('close-card')
+                                tmpThis.parent().addClass('close-card')
+                            }, 1000)
+                        }
+                        // 如果配對成功
+                        else {
+                            // 暫存$(this)，避免計時器中的this指向window
+                            const tmpThis = $(this)
+                            // 暫存前一個正在打開的牌，避免計時器執行時物件已經被清空
+                            const tmpid = $(`#${openCard['id']}`)
+                            setTimeout(function () {
+                                tmpid.parent().fadeTo(200, 0, 'swing')
+                                tmpThis.parent().fadeTo(200, 0, 'swing')
+                                // 如果牌全開了
+                                if ($('.box-img').hasClass('close-card') === false) {
+                                    alert('過關')
+                                }
+                            }, 500)
+                        }
+                        // 清空物件
+                        delete openCard.id
+                        delete openCard.class
                     }
-                    // 如果配對成功
+                    // 如果還沒翻
                     else {
-                        // 暫存$(this)，避免計時器中的this指向window
-                        const tmpThis = $(this)
-                        // 暫存前一個正在打開的牌，避免計時器執行時物件已經被清空
-                        const tmpid = $(`#${openCard['id']}`)
-                        setTimeout(function () {
-                            // tmpid.parent().removeClass('open-card')
-                            // tmpThis.parent().removeClass('open-card')
-                            tmpid.parent().fadeTo(1000, 0, 'swing')
-                            tmpThis.parent().fadeTo(1000, 0, 'swing')
-                        }, 1000)
+                        openCard['id'] = $(this).attr('id')
+                        openCard['class'] = $(this).attr('class').split(' ')[1]
                     }
-                    // 清空物件
-                    delete openCard.id
-                    delete openCard.class
-                }
-                // 如果還沒翻
-                else {
-                    openCard['id'] = $(this).attr('id')
-                    openCard['class'] = $(this).attr('class').split(' ')[1]
-                }
-            })
-            arr.splice(num, 1)
-            id++
+                })
+                arr.splice(num, 1)
+                id++
+            }
         }
 
+        game()
+        $('#restart').on('click', function () {
+            $('#game-area').children().remove()
+            game()
+        })
 
     </script>
 </body>
