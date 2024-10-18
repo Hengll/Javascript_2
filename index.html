@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-TW">
 
 <head>
     <meta charset="UTF-8">
@@ -9,7 +9,7 @@
         #game-area {
             width: 650px;
             height: 610px;
-            background: lightblue;
+            background: green;
             font-size: 0;
             perspective: 800px;
         }
@@ -51,7 +51,10 @@
         }
 
         #restart {
+            width: 100px;
+            height: 40px;
             margin: 10px;
+            font-size: 1.2rem;
         }
     </style>
 </head>
@@ -60,6 +63,7 @@
     <div class="container">
         <div id="game-area"></div>
         <div class="text">
+            <p>翻牌次數:<span id="number-of-times">0</span></p>
             <input id="restart" type="button" value="重新開始">
         </div>
     </div>
@@ -90,6 +94,8 @@
                 $(`#card-${id}`).on('click', function () {
                     // 翻牌
                     $(this).parent().removeClass('close-card')
+                    // 計入翻牌次數
+                    $('#number-of-times').text(`${$('#number-of-times').text() * 1 + 1}`)
 
                     // 如果已經翻一張了
                     if ('id' in openCard) {
@@ -136,6 +142,9 @@
 
         game()
         $('#restart').on('click', function () {
+            // 次數歸零
+            $('#number-of-times').text('0')
+            // 移除所有牌
             $('#game-area').children().remove()
             game()
         })
