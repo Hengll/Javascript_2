@@ -87,7 +87,7 @@
             // 隨機分配牌
             while (arr.length > 0) {
                 const num = rand(0, arr.length - 1)
-                $('#game-area').append(`<div class="box-img close-card"><div class="font-side"></div><div id="card-${id}" class="back-side"></div>`)
+                $('#game-area').append(`<div class="box-img close-card"><div class="font-side"></div><div id="card-${id}" class="back-side"></div></div>`)
                 $(`#card-${id}`).prev().css('background-image', `url(./images/${arr[num]}S.jpg)`)
                 $(`#card-${id}`).addClass(`${arr[num]}S`)
 
